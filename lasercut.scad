@@ -88,7 +88,7 @@ module lasercutout(thickness,  points= [],
             linear_extrude(height = thickness , center = false)  polygon(points=points);
             if(simple_tabs != undef) for (t = [0:1:len(simple_tabs)-1]) 
             {
-                simpleTab(simple_tabs[t][0], simple_tabs[t][1], simple_tabs[t][2], thickness);
+                simpleTab(simple_tabs[t][0], simple_tabs[t][1], simple_tabs[t][2], simple_tabs[t][3] ? simple_tabs[t][3] : [thickness,thickness,thickness]);
             }
             if(captive_nuts != undef) for (t = [0:1:len(captive_nuts)-1]) 
             {
@@ -256,15 +256,17 @@ module lasercutout(thickness,  points= [],
             echo(str("[LC]         , flat_adjust = ", flat_adjust));
         if(milling_bit>0)
             echo(str("[LC]         , milling_bit = ", milling_bit));
+        if(no_joint_points != undef)
+            echo(str("[LC]         , no_joint_points = ", no_joint_points));
         echo("[LC]         ) \n");
     }
 }
 
 
 
-module simpleTab(angle, x, y, thickness)
+module simpleTab(angle, x, y, dimensions)
 {
-    translate([x,y,0]) rotate([0,0,angle]) translate([-thickness/2,0,0]) cube([thickness, thickness, thickness]); 
+    translate([x,y,0]) rotate([0,0,angle]) translate([-dimensions[0]/2,0,0]) cube(dimensions);
 }
 
 module simpleTabHole(angle, x, y, thickness)
