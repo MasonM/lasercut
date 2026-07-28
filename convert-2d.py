@@ -278,6 +278,7 @@ if generate_non_scad_file:
     output = subprocess.run(
         f'"{openscad_path}" "{processed_scad_path}" -o "{output_abs_path}"',
         capture_output=True,
+        shell=True
     )
 
     if output.returncode != 0:
