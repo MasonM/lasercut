@@ -30,6 +30,7 @@ module lasercutoutSquare(thickness, x=0, y=0,
         cutouts_vb = [],
         flat_adjust = [],
         milling_bit = 0.0,
+        no_joint_points = [],
 )
 {
     points = [[0,0], [x,0], [x,y], [0,y], [0,0]];
@@ -50,7 +51,8 @@ lasercutout(thickness=thickness,
         cutouts = cutouts,
         cutouts_vb = cutouts_vb,
         flat_adjust = flat_adjust,
-        milling_bit = milling_bit
+        milling_bit = milling_bit,
+        no_joint_points = no_joint_points
     );
 }
 
@@ -69,6 +71,7 @@ module lasercutout(thickness,  points= [],
         cutouts_vb = [],
         flat_adjust = [],
         milling_bit = 0.0,
+        no_joint_points = [],
 )
 {
     function max_y(points) = max([for (a = [0:1:len(points)-1])  points[a][1]]);    
@@ -86,6 +89,10 @@ module lasercutout(thickness,  points= [],
         union() 
         {
             linear_extrude(height = thickness , center = false)  polygon(points=points);
+            if (no_joint_points != undef)
+            {
+                linear_extrude(height = thickness , center = false)  polygon(points=no_joint_points);
+            }
             if(simple_tabs != undef) for (t = [0:1:len(simple_tabs)-1]) 
             {
                 simpleTab(simple_tabs[t][0], simple_tabs[t][1], simple_tabs[t][2], simple_tabs[t][3] ? simple_tabs[t][3] : [thickness,thickness,thickness]);
