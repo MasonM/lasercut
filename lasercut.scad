@@ -175,7 +175,7 @@ module lasercutout(thickness,  points= [],
         }    
         if(slits != undef) for (t = [0:1:len(slits)-1]) 
         {
-               simpleSlit(slits[t][0], slits[t][1], slits[t][2], slits[t][3], thickness);
+               simpleSlit(is_num(slits[t][0]) ? [0, 0, slits[t][0]-180] : slits[t][0], slits[t][1], slits[t][2], slits[t][3], thickness);
         }
         if(cutouts != undef) for (t = [0:1:len(cutouts)-1]) 
         {
@@ -588,7 +588,7 @@ module circlesRemove(radius, x, y, thickness)
 
 module simpleSlit(angle, x, y, length, thickness)
 {
-     translate([x,y,0]) rotate([0,0,angle-180]) translate([-thickness/2,-length+thickness,-thickness]) cube([thickness, length+thickness, thickness*3]);
+     translate([x,y,0]) rotate(angle) translate([-thickness/2,-length+thickness,-thickness]) cube([thickness, length+thickness, thickness*3]);
 }
 
 module simpleCutouts(x, y, width, height, thickness)
