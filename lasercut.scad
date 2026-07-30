@@ -588,7 +588,7 @@ module circlesRemove(radius, x, y, thickness)
 
 module simpleSlit(angle, x, y, length, thickness)
 {
-     translate([x,y,0]) rotate([0,0,angle-180]) translate([-thickness/2,-thickness,-thickness]) cube([thickness, length+thickness, thickness*3]);
+     translate([x,y,0]) rotate([0,0,angle-180]) translate([-thickness/2,-length+thickness,-thickness]) cube([thickness, length+thickness, thickness*3]);
 }
 
 module simpleCutouts(x, y, width, height, thickness)
