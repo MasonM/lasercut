@@ -281,11 +281,11 @@ module simpleTabHole(angle, x, y, dimensions)
      // Special case does not go past edge - so make only 1 thickness y
      if (angle == 360)
      {
-         translate([x,y,0]) rotate([0,0,0]) translate([0,0,-dimensions[2]]) cube([dimensions[0], dimensions[1], dimensions[2]]);
+         translate([x,y,0]) rotate([0,0,0]) translate([0,0,-dimensions[2]]) cube(dimensions);
      }
      else
      {
-         translate([x,y,0]) rotate([0,0,angle-180]) translate([-dimensions[0]/2,-dimensions[1],-dimensions[2]]) cube([dimensions[0], dimensions[1], dimensions[2]]);
+         translate([x,y,0]) rotate([0,0,angle-180]) translate([-dimensions[0]/2,-dimensions[1],-dimensions[2]]) cube(dimensions);
      }
 }
 
