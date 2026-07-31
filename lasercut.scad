@@ -179,11 +179,11 @@ module lasercutout(thickness,  points= [],
         }
         if(cutouts != undef) for (t = [0:1:len(cutouts)-1]) 
         {
-               simpleCutouts(cutouts[t][0], cutouts[t][1], cutouts[t][2], cutouts[t][3], thickness);
+               simpleCutouts(cutouts[t][0], cutouts[t][1], cutouts[t][2], cutouts[t][3], thickness, cutouts[t][4] ? cutouts[t][4] : [0,0,0]);
         }
         if(cutouts_vb != undef) for (t = [0:1:len(cutouts_vb)-1]) 
         {
-               simpleCutouts(cutouts_vb[t][0], cutouts_vb[t][1], cutouts_vb[t][2], cutouts_vb[t][3], thickness);
+               simpleCutouts(cutouts_vb[t][0], cutouts_vb[t][1], cutouts_vb[t][2], cutouts_vb[t][3], thickness, cutouts[t][4] ? cutouts[t][4] : [0,0,0]);
         }
         if(screw_tabs != undef) for (t = [0:1:len(screw_tabs)-1]) 
         {
@@ -591,9 +591,9 @@ module simpleSlit(angle, x, y, length, thickness)
      translate([x,y,0]) rotate(angle) translate([-thickness/2,-length+thickness,-thickness+1]) cube([thickness, length+thickness, thickness*3]);
 }
 
-module simpleCutouts(x, y, width, height, thickness)
+module simpleCutouts(x, y, width, height, thickness, rotation=[0,0,0])
 {
-    translate([x,y,0]) rotate([0,0,0]) translate([0,0,-thickness]) cube([width, height, thickness*3]);
+    translate([x,y,0]) rotate(rotation) translate([0,0,-thickness]) cube([width, height, thickness*3]);
 }
 
 module lasercutoutBox(thickness, x=0, y=0, z=0, sides=6, num_fingers=2,
