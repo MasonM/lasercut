@@ -125,7 +125,7 @@ module lasercutout(thickness,  points= [],
 
         if(simple_tab_holes != undef) for (t = [0:1:len(simple_tab_holes)-1]) 
         {
-            simpleTabHole(simple_tab_holes[t][0], simple_tab_holes[t][1], simple_tab_holes[t][2], simple_tab_holes[t][3] ? simple_tab_holes[t][3] : [thickness,thickness,thickness]);
+            simpleTabHole(is_num(simple_tab_holes[t][0]) ? [0, 0, simple_tab_holes[t][0]-180] : simple_tab_holes[t][0], simple_tab_holes[t][1], simple_tab_holes[t][2], simple_tab_holes[t][3] ? simple_tab_holes[t][3] : [thickness,thickness,thickness]);
         }
         if(captive_nuts != undef) for (t = [0:1:len(captive_nuts)-1]) 
         {
@@ -279,13 +279,13 @@ module simpleTab(angle, x, y, dimensions)
 module simpleTabHole(angle, x, y, dimensions)
 {
      // Special case does not go past edge - so make only 1 thickness y
-     if (angle == 360)
+     if (angle[0] == 360)
      {
-         translate([x,y,0]) rotate([0,0,0]) translate([0,0,-dimensions[2]]) cube([dimensions[0], dimensions[1], dimensions[2]*3]); 
+         translate([x,y,0]) rotate(angle) translate([0,0,-dimensions[2]]) cube([dimensions[0], dimensions[1], dimensions[2]*3]); 
      }
      else
      {
-         translate([x,y,0]) rotate([0,0,angle-180]) translate([-dimensions[0]/2,-dimensions[1],-dimensions[2]]) cube([dimensions[0], dimensions[1], dimensions[2]*3]); 
+         translate([x,y,0]) rotate(angle) translate([-dimensions[0]/2,0,0]) cube([dimensions[0], dimensions[1], dimensions[2]*3]); 
      }
 }
 
