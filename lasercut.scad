@@ -175,7 +175,7 @@ module lasercutout(thickness,  points= [],
         }    
         if(slits != undef) for (t = [0:1:len(slits)-1]) 
         {
-               simpleSlit(is_num(slits[t][0]) ? [0, 0, slits[t][0]-180] : slits[t][0], slits[t][1], slits[t][2], slits[t][3], thickness);
+               simpleSlit(is_num(slits[t][0]) ? [0, 0, slits[t][0]-180] : slits[t][0], slits[t][1], slits[t][2], slits[t][3], slits[t][4] ? slits[t][4] : thickness);
         }
         if(cutouts != undef) for (t = [0:1:len(cutouts)-1]) 
         {
