@@ -23,6 +23,7 @@ module lasercutoutSquare(thickness, x=0, y=0,
         screw_tabs=[], screw_tab_holes=[],
         twist_holes=[], twist_connect=[],
         clips=[], clip_holes=[],
+        text_add = [],
         circles_add = [],
         circles_remove = [],
         slits = [],
@@ -45,6 +46,7 @@ lasercutout(thickness=thickness,
         screw_tabs= screw_tabs, screw_tab_holes= screw_tab_holes,
         twist_holes=twist_holes, twist_connect=twist_connect,
         clips=clips, clip_holes=clip_holes,
+        text_add = [],
         circles_add = circles_add,
         circles_remove = circles_remove,
         slits = slits,
@@ -64,6 +66,7 @@ module lasercutout(thickness,  points= [],
         screw_tabs=[], screw_tab_holes=[],
         twist_holes=[], twist_connect=[],
         clips=[], clip_holes=[],
+        text_add = [],
         circles_add = [],
         circles_remove = [],
         slits = [],
@@ -201,6 +204,10 @@ module lasercutout(thickness,  points= [],
                     fingerJoint(finger_joints[t][0], finger_joints[t][1], finger_joints[t][2], thickness, max_y, min_y, max_x, min_x, not_mill=false, milling_bit=milling_bit);
             } 
         }
+        if(text_add != undef) for (t = [0:1:len(text_add)-1]) 
+        {
+            textAdd(text_add[t][0], text_add[t][1], text_add[t][2], text_add[t][3], thickness);
+        }  
     }
     
     if (flat_adjust)
@@ -251,6 +258,8 @@ module lasercutout(thickness,  points= [],
             echo(str("[LC]         , clip_holes = ", clip_holes));
         if(circles_add)
             echo(str("[LC]         , circles_add = ", circles_add));
+        if(text_add)
+            echo(str("[LC]         , text_add = ", text_add));
         if(circles_remove)
             echo(str("[LC]         , circles_remove = ", circles_remove));
         if(slits)
@@ -565,6 +574,11 @@ module clipTab(angle, x, y, thickness)
         translate([0.5,0,0]) cube([thickness,thickness,thickness]);
 *       cube([thickness*2+1,thickness,thickness], center=true);       
     }
+}
+
+module textAdd(text, size, x, y, thickness)
+{
+    color("black") translate([x,y,0]) linear_extrude(height = thickness) text(text=text, size=size);
 }
 
 module clipHole(angle, x, y, thickness)
