@@ -110,11 +110,11 @@ module lasercutout(thickness,  points= [],
             }    
             if(finger_joints != undef) for (t = [0:1:len(finger_joints)-1]) 
             {
-                fingerJoint(finger_joints[t][0], finger_joints[t][1], finger_joints[t][2], thickness, max_y, min_y, max_x, min_x);
+                fingerJoint(finger_joints[t][0], finger_joints[t][1], finger_joints[t][2], finger_joints[t][3] ? finger_joints[t][3] : [thickness, thickness], max_y, min_y, max_x, min_x);
             }    
             if(bumpy_finger_joints != undef) for (t = [0:1:len(bumpy_finger_joints)-1]) 
             {
-                fingerJoint(bumpy_finger_joints[t][0], bumpy_finger_joints[t][1], bumpy_finger_joints[t][2], thickness, max_y, min_y, max_x, min_x, bumps=true);
+                fingerJoint(bumpy_finger_joints[t][0], bumpy_finger_joints[t][1], bumpy_finger_joints[t][2], bumpy_finger_joints[t][3] ? bumpy_finger_joints[t][3] : [thickness, thickness], max_y, min_y, max_x, min_x, bumps=true);
             }
             if(screw_tabs != undef) for (t = [0:1:len(screw_tabs)-1]) 
             {
@@ -201,7 +201,7 @@ module lasercutout(thickness,  points= [],
         {
             for (t = [0:1:len(finger_joints)-1]) 
             {
-                    fingerJoint(finger_joints[t][0], finger_joints[t][1], finger_joints[t][2], thickness, max_y, min_y, max_x, min_x, not_mill=false, milling_bit=milling_bit);
+                    fingerJoint(finger_joints[t][0], finger_joints[t][1], finger_joints[t][2], finger_joints[t][3] ? finger_joints[t][3] : [thickness, thickness], max_y, min_y, max_x, min_x, not_mill=false, milling_bit=milling_bit);
             } 
         }
         if(text_add != undef) for (t = [0:1:len(text_add)-1]) 
@@ -311,7 +311,7 @@ module captiveNutBoltHole(angle, x, y, nut_flat_width, thickness)
     }
 }
 
-module fingerJoint(angle, start_up, fingers, thickness, max_y, min_y, max_x, min_x, bumps = false, not_mill=true, milling_bit=0)
+module fingerJoint(angle, start_up, fingers, dimensions, max_y, min_y, max_x, min_x, bumps = false, not_mill=true, milling_bit=0)
 {
     if ( angle == UP )
     {
@@ -321,11 +321,11 @@ module fingerJoint(angle, start_up, fingers, thickness, max_y, min_y, max_x, min
         t_y = max_y;
         if(not_mill)
         {
-            fingers(angle, start_up, fingers, thickness, range_min, range_max, t_x, t_y, bumps = bumps);
+            fingers(angle, start_up, fingers, dimensions, range_min, range_max, t_x, t_y, bumps = bumps);
         }
         else
         {
-            fingers_mill(angle, start_up, fingers, thickness, range_min, range_max, t_x, t_y, bit=milling_bit);
+            fingers_mill(angle, start_up, fingers, dimensions, range_min, range_max, t_x, t_y, bit=milling_bit);
         }
     }
     if ( angle == DOWN )
@@ -336,11 +336,11 @@ module fingerJoint(angle, start_up, fingers, thickness, max_y, min_y, max_x, min
         t_y = min_y;
         if(not_mill)
         {
-            fingers(angle, start_up, fingers, thickness, range_min, range_max, t_x, t_y, bumps = bumps);
+            fingers(angle, start_up, fingers, dimensions, range_min, range_max, t_x, t_y, bumps = bumps);
         }
         else
         {
-            fingers_mill(angle, start_up, fingers, thickness, range_min, range_max, t_x, t_y, bit=milling_bit);
+            fingers_mill(angle, start_up, fingers, dimensions, range_min, range_max, t_x, t_y, bit=milling_bit);
         }
     }
     if ( angle == LEFT )
@@ -351,11 +351,11 @@ module fingerJoint(angle, start_up, fingers, thickness, max_y, min_y, max_x, min
         t_y = min_y;
         if(not_mill)
         {
-            fingers(angle, start_up, fingers, thickness, range_min, range_max, t_x, t_y, bumps = bumps);
+            fingers(angle, start_up, fingers, dimensions, range_min, range_max, t_x, t_y, bumps = bumps);
         }
         else
         {
-            fingers_mill(angle, start_up, fingers, thickness, range_min, range_max, t_x, t_y, bit=milling_bit);
+            fingers_mill(angle, start_up, fingers, dimensions, range_min, range_max, t_x, t_y, bit=milling_bit);
         }
     }
     if ( angle == RIGHT )
@@ -366,24 +366,24 @@ module fingerJoint(angle, start_up, fingers, thickness, max_y, min_y, max_x, min
         t_y = max_y;
         if(not_mill)
         {
-            fingers(angle, start_up, fingers, thickness, range_min, range_max, t_x, t_y, bumps = bumps);
+            fingers(angle, start_up, fingers, dimensions, range_min, range_max, t_x, t_y, bumps = bumps);
         }
         else
         {
-            fingers_mill(angle, start_up, fingers, thickness, range_min, range_max, t_x, t_y, bit=milling_bit);
+            fingers_mill(angle, start_up, fingers, dimensions, range_min, range_max, t_x, t_y, bit=milling_bit);
         }
     }
 
 }
 
 
-module fingers(angle, start_up, fingers, thickness, range_min, range_max, t_x, t_y, bumps = false)
+module fingers(angle, start_up, fingers, dimensions, range_min, range_max, t_x, t_y, bumps = false)
 {
 
     // The tweaks to y translate([0, -thickness,0]) ... thickness*2 rather than *1
     // Are to avoid edge cases and make the dxf export better.
     // All fun
-    translate([t_x, t_y,0]) rotate([0,0,angle]) translate([0, -thickness,0])
+    translate([t_x, t_y,0]) rotate([0,0,angle]) translate([0, -dimensions[0],0])
     {
         for ( p = [ 0 : 1 : fingers-1] )
 		{
@@ -395,10 +395,10 @@ module fingers(angle, start_up, fingers, thickness, range_min, range_max, t_x, t
 				kerfMove = (p == 0) ? 0 : kerf/2;
                 translate([i-kerfMove,0,0]) 
                 {
-                    cube([ (range_max-range_min)/(fingers*2) + kerfSize, thickness*2, thickness]);
+                    cube([ (range_max-range_min)/(fingers*2) + kerfSize, dimensions[0]*2, dimensions[1]]);
                     if(bumps == true)
                     {
-                        translate([(range_max-range_min)/(fingers*2)+ kerfSize, thickness*1.5, 0]) cylinder(h=thickness, r=thickness/10);
+                        translate([(range_max-range_min)/(fingers*2)+ kerfSize, dimensions[0]*1.5, 0]) cylinder(h=dimensions[1], r=dimensions[1]/10);
                     }
                 }
             }
@@ -406,14 +406,14 @@ module fingers(angle, start_up, fingers, thickness, range_min, range_max, t_x, t
             {
 				kerfSize = (p==fingers-1) ? kerf/2 : kerf;
 				kerfMove = kerf/2;
-                translate([i+(range_max-range_min)/(fingers*2)-kerfMove,thickness,0]) 
+                translate([i+(range_max-range_min)/(fingers*2)-kerfMove,dimensions[0],0]) 
                 {
-                    cube([ (range_max-range_min)/(fingers*2)+kerfSize, thickness, thickness]);
+                    cube([ (range_max-range_min)/(fingers*2)+kerfSize, dimensions[0], dimensions[1]]);
                     if(bumps == true)
                     {
                         if (i < (range_max - (range_max-range_min)/fingers ))
                         {
-                            translate([(range_max-range_min)/(fingers*2)+ kerfSize, thickness*1.5, 0]) cylinder(h=thickness, r=thickness/10);
+                            translate([(range_max-range_min)/(fingers*2)+ kerfSize, dimensions[0]*1.5, 0]) cylinder(h=dimensions[1], r=dimensions[1]/10);
                         }
                     }
                 }
@@ -423,13 +423,13 @@ module fingers(angle, start_up, fingers, thickness, range_min, range_max, t_x, t
 
 }
 
-module fingers_mill(angle, start_up, fingers, thickness, range_min, range_max, t_x, t_y, bit=6.35/2)
+module fingers_mill(angle, start_up, fingers, dimensions, range_min, range_max, t_x, t_y, bit=6.35/2)
 {
 
     // The tweaks to y translate([0, -thickness,0]) ... thickness*2 rather than *1
     // Are to avoid edge cases and make the dxf export better.
     // All fun
-    translate([t_x, t_y,0]) rotate([0,0,angle]) translate([0, -thickness,0])
+    translate([t_x, t_y,0]) rotate([0,0,angle]) translate([0, -dimensions[0],0])
     {
         for ( p = [ 0 : 1 : fingers-1] )
 		{
@@ -437,16 +437,16 @@ module fingers_mill(angle, start_up, fingers, thickness, range_min, range_max, t
             {
                 translate([((range_max-range_min)/fingers)*p,0,0]) 
                 {
-                    translate([(range_max-range_min)/(fingers*2) + bit/2,thickness,0]) cylinder(h=thickness*4, d=bit, center=true );
-                    translate([2*(range_max-range_min)/(fingers*2) - bit/2,thickness,0]) cylinder(h=thickness*4, d=bit, center=true );
+                    translate([(range_max-range_min)/(fingers*2) + bit/2,dimensions[0],0]) cylinder(h=dimensions[1]*4, d=bit, center=true );
+                    translate([2*(range_max-range_min)/(fingers*2) - bit/2,dimensions[0],0]) cylinder(h=dimensions[1]*4, d=bit, center=true );
                 }
             }
             else 
             {
                 translate([((range_max-range_min)/fingers)*p,0,0]) 
                 {
-                    translate([bit/2,thickness,0]) cylinder(h=thickness*4, d=bit, center=true );
-                    translate([(range_max-range_min)/(fingers*2) - bit/2,thickness,0]) cylinder(h=thickness*4, d=bit, center=true );
+                    translate([bit/2,dimensions[0],0]) cylinder(h=dimensions[1]*4, d=bit, center=true );
+                    translate([(range_max-range_min)/(fingers*2) - bit/2,dimensions[0],0]) cylinder(h=dimensions[1]*4, d=bit, center=true );
                 }
             }
         }
