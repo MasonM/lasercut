@@ -184,7 +184,7 @@ parser.add_argument('--keep', '-k',
                     help='Keep the intermediate scad file if output type is not already scad')
 
 parser.add_argument('--library', '-l',
-                    default='lasercut.scad',
+                    default=f'{os.path.dirname(os.path.realpath(__file__))}/lasercut.scad',
                     help='Path to the lasercut.scad library. Value is place in the include <XXX> string.')
 
 parser.add_argument('--define', '-D',
