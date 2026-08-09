@@ -6,6 +6,7 @@ MID = 360;
 kerf=0.0;// Hacky global for kerf
 
 generate = 0; 
+generate_only = false;
 
 if (generate == 1)
 {
@@ -229,7 +230,7 @@ module lasercutout(thickness,  points= [],
         }
     }
 
-    if (generate == 1)
+    if (generate == 1 && (!generate_only || generate_only == thickness))
     {
         echo(str("[LC] lasercutout(thickness = ",thickness,", \n          points = ",points));
         if(simple_tabs)
