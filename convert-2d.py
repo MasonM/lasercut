@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Process a lasercut box to enable its production on a laser cutter, 3D printer, or other comparable device
 
