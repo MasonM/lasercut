@@ -86,7 +86,8 @@ def get_openscad_path() -> str:
     return out_path
 
 
-def process_scad_file(in_scad_path: str, out_scad_path: str, library_path: str, extrusion_thick: float = 0) -> None:
+def process_scad_file(in_scad_path: str, out_scad_path: str, library_path: str, extrusion_thick: float = 0,
+                      defines: list = None) -> None:
     """
     Process the input 3D OpenSCAD file to generate a file of each piece pieces
 
@@ -97,6 +98,7 @@ def process_scad_file(in_scad_path: str, out_scad_path: str, library_path: str, 
     :param library_path: Path to the lasercut.scad library. Value is placed directly in "include <XXX>" string
     :param extrusion_thick: If value is greater than 0, this is the number of mm to extrude the flattened surfaces.
         If value is less than or equal to 0, outputted file will be 2D.
+    :param defines: List of "VAR=VALUE" strings passed to OpenSCAD via "-D"
     :return: None
     """
 
@@ -107,9 +109,11 @@ def process_scad_file(in_scad_path: str, out_scad_path: str, library_path: str, 
     temp_csg = os.path.join(os.path.dirname(out_scad_path),
                             temp_file_base_name)
 
+    define_args = "".join(f' -D "{define}"' for define in (defines or []))
+
     print(f'Processing "{os.path.basename(in_scad_path)}"')
     cmd_output = subprocess.run(
-        f'"{openscad_path}" "{in_scad_path}" -D generate=1 -o "{temp_csg}"',
+        f'"{openscad_path}" "{in_scad_path}" -D generate=1{define_args} -o "{temp_csg}"',
         capture_output=True,
         shell=True
     )
@@ -182,6 +186,13 @@ parser.add_argument('--keep', '-k',
 parser.add_argument('--library', '-l',
                     default='lasercut.scad',
                     help='Path to the lasercut.scad library. Value is place in the include <XXX> string.')
+
+parser.add_argument('--define', '-D',
+                    action='append',
+                    default=[],
+                    metavar='VAR=VALUE',
+                    help='Set an OpenSCAD variable via "-D". May be given multiple times, '
+                         'e.g. -D thickness=3 -D width=100')
 
 parser.add_argument('--openscadbin', '-b',
                     type=str,
@@ -266,9 +277,15 @@ keep_intermediate_file = args.keep or os.path.isfile(processed_scad_path)
 if source_abs_path == processed_scad_path:
     exit_with_error("Source path and processed SCAD path are the same. Please change your output file name.")
 
+# Verify the given variable definitions are in the form VAR=VALUE
+for define in args.define:
+    if '=' not in define:
+        exit_with_error(f'Invalid variable definition "{define}". Must be in the form VAR=VALUE')
+
 # Process the input openscad file
 process_scad_file(source_abs_path, processed_scad_path,
-                  library_path=args.library, extrusion_thick=args.extrude)
+                  library_path=args.library, extrusion_thick=args.extrude,
+                  defines=args.define)
 
 # Render the file as the desired file type
 if generate_non_scad_file:
