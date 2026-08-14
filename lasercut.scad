@@ -283,7 +283,13 @@ module lasercutout(thickness,  points= [],
 
 module simpleTab(angle, x, y, dimensions)
 {
-    translate([x,y,0]) rotate([0,0,angle]) translate([-dimensions[0]/2,0,0]) cube(dimensions);
+    // Overlap the tab slightly into the body of the part. The extruded
+    // polygon outline is quantized by the 2D subsystem (Clipper), so a tab
+    // placed exactly on the edge can be separated from the body by a
+    // nanometer-scale gap, splitting the projection into multiple contours.
+    overlap = 0.01;
+    translate([x,y,0]) rotate([0,0,angle]) translate([-dimensions[0]/2,-overlap,0])
+        cube([dimensions[0], dimensions[1]+overlap, dimensions[2]]);
 }
 
 module simpleTabHole(angle, x, y, dimensions)
