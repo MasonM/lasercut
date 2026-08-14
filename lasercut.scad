@@ -273,7 +273,7 @@ module lasercutout(thickness,  points= [],
             echo(str("[LC]         , flat_adjust = ", flat_adjust));
         if(milling_bit>0)
             echo(str("[LC]         , milling_bit = ", milling_bit));
-        if(no_joint_points != undef)
+        if(no_joint_points)
             echo(str("[LC]         , no_joint_points = ", no_joint_points));
         echo("[LC]         ) \n");
     }
