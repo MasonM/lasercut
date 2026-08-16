@@ -195,6 +195,17 @@ parser.add_argument('--define', '-D',
                     help='Set an OpenSCAD variable via "-D". May be given multiple times, '
                          'e.g. -D thickness=3 -D width=100')
 
+parser.add_argument('--pack', '-p',
+                    action='store_true',
+                    help='Repack the pieces in the exported SVG so they sit closer together. '
+                         'Only valid when the output is an svg file.')
+
+parser.add_argument('--pack-spacing',
+                    type=float,
+                    default=2.0,
+                    metavar='MM',
+                    help='Gap between pieces in mm when using --pack (default: 2)')
+
 parser.add_argument('--openscadbin', '-b',
                     type=str,
                     help='Use the OpenSCAD executable at the given path instead of the default path for the OS')
@@ -283,6 +294,10 @@ for define in args.define:
     if '=' not in define:
         exit_with_error(f'Invalid variable definition "{define}". Must be in the form VAR=VALUE')
 
+# Packing only works on the exported SVG
+if args.pack and output_extension != '.svg':
+    exit_with_error('--pack requires the output to be an svg file')
+
 # Process the input openscad file
 process_scad_file(source_abs_path, processed_scad_path,
                   library_path=args.library, extrusion_thick=args.extrude,
@@ -305,3 +320,12 @@ if generate_non_scad_file:
     # Delete the intermediate, processed scad file if not requested otherwise
     if not keep_intermediate_file:
         os.remove(processed_scad_path)
+
+    if args.pack:
+        from pack_svg import pack_svg_file
+
+        print("Repacking SVG pieces")
+        try:
+            pack_svg_file(output_abs_path, spacing=args.pack_spacing)
+        except ValueError as error:
+            exit_with_error(f"Failed to pack SVG: {error}")
