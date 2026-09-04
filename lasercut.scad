@@ -30,6 +30,7 @@ module lasercutoutSquare(thickness, x=0, y=0,
         slits = [],
         cutouts = [],
         cutouts_vb = [],
+        svg_cutouts = [],
         flat_adjust = [],
         milling_bit = 0.0,
         no_joint_points = [],
@@ -53,6 +54,7 @@ lasercutout(thickness=thickness,
         slits = slits,
         cutouts = cutouts,
         cutouts_vb = cutouts_vb,
+        svg_cutouts = svg_cutouts,
         flat_adjust = flat_adjust,
         milling_bit = milling_bit,
         no_joint_points = no_joint_points
@@ -73,6 +75,7 @@ module lasercutout(thickness,  points= [],
         slits = [],
         cutouts = [],
         cutouts_vb = [],
+        svg_cutouts = [],
         flat_adjust = [],
         milling_bit = 0.0,
         no_joint_points = [],
@@ -189,6 +192,21 @@ module lasercutout(thickness,  points= [],
         {
                simpleCutouts(cutouts_vb[t][0], cutouts_vb[t][1], cutouts_vb[t][2], cutouts_vb[t][3], thickness, cutouts[t][4] ? cutouts[t][4] : [0,0,0]);
         }
+        if(svg_cutouts != undef) for (t = [0:1:len(svg_cutouts)-1]) 
+        {
+               if (is_string(svg_cutouts[t]))
+               {
+                   svgCutout(svg_cutouts[t], thickness=thickness);
+               }
+               else
+               {
+                   svgCutout(svg_cutouts[t][0], 
+                       pos = svg_cutouts[t][1] != undef ? svg_cutouts[t][1] : [0,0], 
+                       sc = svg_cutouts[t][2] != undef ? svg_cutouts[t][2] : 1.0, 
+                       angle = svg_cutouts[t][3] != undef ? svg_cutouts[t][3] : 0, 
+                       thickness = thickness);
+               }
+        }
         if(screw_tabs != undef) for (t = [0:1:len(screw_tabs)-1]) 
         {
                screwTabHoleForScrew(screw_tabs[t][0], screw_tabs[t][1], screw_tabs[t][2], screw_tabs[t][3], thickness);
@@ -269,6 +287,8 @@ module lasercutout(thickness,  points= [],
             echo(str("[LC]         , cutouts = ", cutouts));
         if(cutouts_vb)
             echo(str("[LC]         , cutouts_vb = ", cutouts_vb));
+        if(svg_cutouts)
+            echo(str("[LC]         , svg_cutouts = ", svg_cutouts));
         if(flat_adjust)
             echo(str("[LC]         , flat_adjust = ", flat_adjust));
         if(milling_bit>0)
@@ -615,6 +635,20 @@ module simpleSlit(angle, x, y, length, thickness)
 module simpleCutouts(x, y, width, height, thickness, rotation=[0,0,0])
 {
     translate([x,y,0]) rotate(rotation) translate([0,0,-thickness]) cube([width, height, thickness*3]);
+}
+
+// Import an SVG file and cut its shape out of the lasercut part.
+// filename : path to the SVG file to import
+// pos      : [x, y] translation of the imported shape
+// sc       : uniform scale factor applied to the imported shape
+// angle    : rotation (degrees) about the Z axis
+module svgCutout(filename, pos=[0,0], sc=1.0, angle=0, thickness)
+{
+    translate([pos[0], pos[1], -thickness])
+        rotate([0, 0, angle])
+            scale([sc, sc, 1])
+                linear_extrude(height = thickness*3, center = false)
+                    import(file = filename, center = false);
 }
 
 module lasercutoutBox(thickness, x=0, y=0, z=0, sides=6, num_fingers=2,
